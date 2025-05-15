@@ -2,38 +2,45 @@ package com.joao.demo.service;
 
 import com.joao.demo.entity.User;
 import com.joao.demo.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public void save(User user) {
+        var password = user.getPassword();
+        user.setPassword(encoder.encode(password));
+        userRepository.save(user);
     }
 
-    public User create(User user) {
-        return userRepository.save(user);
+    public User getByLogin(String username){
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
-    public Optional<User> update(Long id, User user) {
+    public Optional<User> update(UUID id, User user) {
        return userRepository.findById(id).map(existingUser -> {
-           existingUser.setNome(user.getNome());
-           existingUser.setSenha(user.getSenha());
+           existingUser.setUsername(user.getUsername());
+           existingUser.setPassword(user.getPassword());
            return userRepository.save(existingUser);
        });
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         userRepository.deleteById(id);
     }
 
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(UUID id) {
         return userRepository.findById(id);
     }
 

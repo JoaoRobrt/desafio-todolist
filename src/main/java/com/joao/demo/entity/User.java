@@ -1,64 +1,30 @@
 package com.joao.demo.entity;
 
+import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table( name = "users")
+@Data
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     @NotNull
-    private String nome;
+    private String username;
     @NotNull
-    private String senha;
+    private String password;
+    @NotNull
+    private String role;
 
     @OneToMany
-    List<Todo> todos = new ArrayList<>();
-
-    public User() {
-
-    }
-
-    public User(String nome, String senha) {
-        this.nome = nome;
-        this.senha = senha;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public @NotNull String getNome() {
-        return nome;
-    }
-
-    public void setNome(@NotNull String nome) {
-        this.nome = nome;
-    }
-
-    public @NotNull String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(@NotNull String senha) {
-        this.senha = senha;
-    }
-
-    public List<Todo> getTodos() {
-        return todos;
-    }
-
-    public void addTodo(Todo todo){
-        todos.add(todo);
-    }
-
-    public void removeTodo(Todo todo){
-        todos.remove(todo);
-    }
+    private List<Todo> todos = new ArrayList<>();
 }

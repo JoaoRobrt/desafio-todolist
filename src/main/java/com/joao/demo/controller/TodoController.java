@@ -2,12 +2,15 @@ package com.joao.demo.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 
 import com.joao.demo.entity.Todo;
 import com.joao.demo.service.TodoService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/todos")
@@ -20,7 +23,12 @@ public class TodoController {
 	
 	@PostMapping
 	public List<Todo> create(@RequestBody @Valid Todo todo) {
-		return todoService.create(todo);
+		try{
+			return todoService.create(todo);
+		}catch(IllegalArgumentException e){
+			var mesageError = e.getMessage();
+			throw new ResponseStatusException(HttpStatus.CONFLICT, mesageError);
+		}
 	}
 
 	@GetMapping("{id}")
@@ -34,7 +42,7 @@ public class TodoController {
 	}
 
 	@PutMapping("{id}")
-	public List<Todo> atualizarStatus(@PathVariable Long id, @RequestBody Todo todo){
+	public List<Todo> update(@PathVariable Long id, @RequestBody Todo todo){
 		todo.setId(id);
 		return todoService.update(todo);
 	}
